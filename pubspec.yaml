@@ -47,7 +47,8 @@ dependencies:
   mobx:
   build_runner:
   get_it:
-
+  intl:
+  timer_builder: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:attendence_management_system/provider/store_file/password_store.dart';
+import 'package:attendence_management_system/view/utils/my_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
@@ -241,7 +242,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                             ),
-                            Observer(builder: (context) {
+                            Observer(builder: (_) {
                               return TextFormField(
                                 obscureText: passwordStore.hide.value,
                                 cursorColor: Colors.black,
@@ -257,14 +258,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     color: Colors.black,
                                   ),
                                   suffixIcon: IconButton(
-                                    icon: passwordStore.hideOrShowPassword() ==
-                                            true
+                                    icon: passwordStore.hide.value == true
                                         ? const Icon(
                                             Icons.visibility_off,
                                             color: Colors.black,
                                           )
                                         : const Icon(Icons.visibility),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      passwordStore.hideOrShowPassword();
+                                    },
                                   ),
                                   labelText: "Password",
                                   labelStyle: GoogleFonts.solway(
@@ -292,7 +294,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(MyRoutes.login);
+                        },
                         child: Text(
                           "Login",
                           style: GoogleFonts.solway(
@@ -306,7 +310,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ],
                   ),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(MyRoutes.homepage);
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: ClipRRect(
@@ -323,14 +329,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 child: Container(),
                               ),
                               Container(
-                                child: Text(
-                                  "SIGN UP",
-                                  style: GoogleFonts.solway(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 20.sp,
-                                  ),
-                                ),
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   border: Border.all(
@@ -344,6 +342,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       Colors.grey.withOpacity(0.4),
                                       Colors.grey.withOpacity(0.1),
                                     ],
+                                  ),
+                                ),
+                                child: Text(
+                                  "SIGN UP",
+                                  style: GoogleFonts.solway(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 20.sp,
                                   ),
                                 ),
                               ),

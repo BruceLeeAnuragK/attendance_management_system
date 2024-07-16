@@ -4,6 +4,6 @@ class PasswordStore with Store {
   Observable<bool> hide = Observable(true);
 
   hideOrShowPassword() {
-    Action(() => hide.value = !hide.value);
+    runInAction(() => hide.value = !hide.value);
   }
 }
