@@ -1,11 +1,14 @@
 import 'dart:ui';
 
+import 'package:attendence_management_system/provider/store_file/auth_store.dart';
 import 'package:attendence_management_system/provider/store_file/password_store.dart';
+import 'package:attendence_management_system/view/utils/my_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../provider/get_store.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -14,7 +17,9 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-final PasswordStore passwordStore = GetIt.instance<PasswordStore>();
+final AuthStore authStore = getIt<AuthStore>();
+final PasswordStore passwordStore = getIt<PasswordStore>();
+final _formKey = GlobalKey<FormState>();
 
 class _SignUpScreenState extends State<SignUpScreen> {
   @override
@@ -25,7 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             ClipRRect(
               child: SizedBox(
-                height: 50.h,
+                height: 40.h,
                 width: 100.w,
                 child: Stack(
                   children: [
@@ -82,6 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             Form(
+              key: _formKey,
               child: Column(
                 children: [
                   const SizedBox(
@@ -122,6 +128,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                             TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Username is required.";
+                                } else if (value.length <= 6) {
+                                  return "Username must be at least of 6 letters";
+                                }
+                                return null;
+                              },
+                              controller: authStore.username,
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
                                 focusColor: Colors.black,
@@ -183,6 +198,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                             TextFormField(
+                              controller: authStore.email,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter an email';
+                                }
+                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                    .hasMatch(value)) {
+                                  return 'Please enter a valid email address (use @gmail.com)';
+                                }
+                                return null;
+                              },
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
                                 focusColor: Colors.black,
@@ -241,8 +267,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                             ),
-                            Observer(builder: (context) {
+                            Observer(builder: (_) {
                               return TextFormField(
+                                controller: authStore.password,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "The Password must be very important for Authentication.";
+                                  }
+                                  return null;
+                                },
                                 obscureText: passwordStore.hide.value,
                                 cursorColor: Colors.black,
                                 textInputAction: TextInputAction.done,
@@ -257,14 +290,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     color: Colors.black,
                                   ),
                                   suffixIcon: IconButton(
-                                    icon: passwordStore.hideOrShowPassword() ==
-                                            true
+                                    icon: passwordStore.hide.value == true
                                         ? const Icon(
                                             Icons.visibility_off,
                                             color: Colors.black,
                                           )
                                         : const Icon(Icons.visibility),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      passwordStore.hideOrShowPassword();
+                                    },
                                   ),
                                   labelText: "Password",
                                   labelStyle: GoogleFonts.solway(
@@ -292,7 +326,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(MyRoutes.login);
+                        },
                         child: Text(
                           "Login",
                           style: GoogleFonts.solway(
@@ -306,7 +342,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ],
                   ),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if (_formKey.currentState?.validate() ?? false) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Processing Data')),
+                        );
+                      } else {
+                        Navigator.of(context)
+                            .pushNamed(MyRoutes.bottomNavigation);
+                      }
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: ClipRRect(
@@ -323,14 +368,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 child: Container(),
                               ),
                               Container(
-                                child: Text(
-                                  "SIGN UP",
-                                  style: GoogleFonts.solway(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 20.sp,
-                                  ),
-                                ),
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   border: Border.all(
@@ -344,6 +381,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       Colors.grey.withOpacity(0.4),
                                       Colors.grey.withOpacity(0.1),
                                     ],
+                                  ),
+                                ),
+                                child: Text(
+                                  "SIGN UP",
+                                  style: GoogleFonts.solway(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 20.sp,
                                   ),
                                 ),
                               ),

@@ -1,5 +1,8 @@
 import 'package:attendence_management_system/provider/get_store.dart';
-import 'package:attendence_management_system/view/screen/home_screen.dart';
+import 'package:attendence_management_system/view/screen/analytics_screen.dart';
+import 'package:attendence_management_system/view/screen/attendance_screen.dart';
+import 'package:attendence_management_system/view/screen/home/home_bottom_navigation_screen.dart';
+import 'package:attendence_management_system/view/screen/home/home_screen.dart';
 import 'package:attendence_management_system/view/screen/login_screen.dart';
 import 'package:attendence_management_system/view/screen/sign_up_screen.dart';
 import 'package:attendence_management_system/view/screen/splash_screen.dart';
@@ -33,12 +36,16 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        initialRoute: MyRoutes.signup,
+        initialRoute: MyRoutes.splashScreen,
         routes: {
           MyRoutes.homepage: (context) => const HomePage(),
-          MyRoutes.splashscreen: (context) => const SplashScreen(),
+          MyRoutes.bottomNavigation: (context) =>
+              const HomeBottomNavigationScreen(),
+          MyRoutes.splashScreen: (context) => const SplashScreen(),
           MyRoutes.login: (context) => const LoginScreen(),
           MyRoutes.signup: (context) => const SignUpScreen(),
+          MyRoutes.attendanceScreen: (context) => const MyAttendance(),
+          MyRoutes.analyticsScreen: (context) => const MyAnalyticsScreen(),
         },
       );
     });
