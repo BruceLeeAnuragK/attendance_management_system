@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:attendence_management_system/provider/store_file/password_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../provider/get_store.dart';
 import '../utils/my_routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final PasswordStore passwordStore = getIt<PasswordStore>();
+  final PasswordStore passwordStore = GetIt.instance<PasswordStore>();
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             ClipRRect(
               child: SizedBox(
-                height: 40.h,
+                height: 50.h,
                 width: 100.w,
                 child: Stack(
                   children: [
@@ -251,8 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   MaterialButton(
                     onPressed: () {
-                      Navigator.of(context)
-                          .pushNamed(MyRoutes.bottomNavigation);
+                      Navigator.of(context).pushNamed(MyRoutes.homepage);
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(10),
