@@ -53,6 +53,9 @@ dependencies:
   tutorial_coach_mark:
   curved_navigation_bar:
   fl_chart:
+  crypto:
+  dropdown_button2:
+
 
 dev_dependencies:
   flutter_test:

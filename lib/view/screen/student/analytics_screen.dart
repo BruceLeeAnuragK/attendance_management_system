@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../provider/get_store.dart';
+import '../../../provider/get_store.dart';
 
 class MyAnalyticsScreen extends StatefulWidget {
   const MyAnalyticsScreen({super.key});

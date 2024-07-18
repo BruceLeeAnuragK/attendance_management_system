@@ -1,11 +1,13 @@
 import 'package:attendence_management_system/provider/get_store.dart';
-import 'package:attendence_management_system/view/screen/analytics_screen.dart';
-import 'package:attendence_management_system/view/screen/attendance_screen.dart';
-import 'package:attendence_management_system/view/screen/home/home_bottom_navigation_screen.dart';
-import 'package:attendence_management_system/view/screen/home/home_screen.dart';
-import 'package:attendence_management_system/view/screen/login_screen.dart';
-import 'package:attendence_management_system/view/screen/sign_up_screen.dart';
-import 'package:attendence_management_system/view/screen/splash_screen.dart';
+import 'package:attendence_management_system/view/screen/check_role_screen.dart';
+import 'package:attendence_management_system/view/screen/student/analytics_screen.dart';
+import 'package:attendence_management_system/view/screen/student/attendance_screen.dart';
+import 'package:attendence_management_system/view/screen/student/home/home_bottom_navigation_screen.dart';
+import 'package:attendence_management_system/view/screen/student/home/home_screen.dart';
+import 'package:attendence_management_system/view/screen/student/login_screen.dart';
+import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
+import 'package:attendence_management_system/view/screen/student/splash_screen.dart';
+import 'package:attendence_management_system/view/screen/teacher/home/home_paget.dart';
 import 'package:attendence_management_system/view/utils/my_routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -39,9 +41,11 @@ class MyApp extends StatelessWidget {
         initialRoute: MyRoutes.splashScreen,
         routes: {
           MyRoutes.homepage: (context) => const HomePage(),
+          MyRoutes.tHomepage: (context) => const THomePage(),
           MyRoutes.bottomNavigation: (context) =>
               const HomeBottomNavigationScreen(),
           MyRoutes.splashScreen: (context) => const SplashScreen(),
+          MyRoutes.checkRoleScreen: (context) => const CheckRoleScreen(),
           MyRoutes.login: (context) => const LoginScreen(),
           MyRoutes.signup: (context) => const SignUpScreen(),
           MyRoutes.attendanceScreen: (context) => const MyAttendance(),

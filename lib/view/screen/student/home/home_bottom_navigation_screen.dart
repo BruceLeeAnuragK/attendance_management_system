@@ -1,13 +1,13 @@
 import 'package:attendence_management_system/provider/store_file/bottom_navigation_store.dart';
-import 'package:attendence_management_system/view/screen/analytics_screen.dart';
-import 'package:attendence_management_system/view/screen/attendance_screen.dart';
-import 'package:attendence_management_system/view/screen/home/home_screen.dart';
+import 'package:attendence_management_system/view/screen/student/analytics_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../provider/get_store.dart';
+import '../../../../provider/get_store.dart';
+import '../attendance_screen.dart';
+import '../home_screen.dart';
 
 class HomeBottomNavigationScreen extends StatefulWidget {
   const HomeBottomNavigationScreen({super.key});
@@ -21,7 +21,9 @@ class _HomeBottomNavigationScreenState
     extends State<HomeBottomNavigationScreen> {
   List pages = [
     const MyAttendance(),
-    const HomePage(),
+    Observer(builder: (context) {
+      return const HomePage();
+    }),
     const MyAnalyticsScreen(),
   ];
   final BottomNavigationStore bottomNavigationStore =
