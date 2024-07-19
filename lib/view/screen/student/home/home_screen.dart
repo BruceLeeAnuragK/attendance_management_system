@@ -1,9 +1,13 @@
 import 'dart:math';
 
+import 'package:attendence_management_system/provider/get_store.dart';
+import 'package:attendence_management_system/provider/store_file/auth_store.dart';
 import 'package:attendence_management_system/view/components/glass_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:sizer/sizer.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,12 +22,15 @@ class _HomePageState extends State<HomePage>
   late AnimationController animationController;
   late Animation<double> animation;
 
+  final AuthStore authStore = getIt<AuthStore>();
+
   @override
   void initState() {
     super.initState();
+
     animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 10),
+      duration: const Duration(seconds: 10),
     );
     animation = Tween<double>(begin: 0, end: 1).animate(animationController)
       ..addListener(() {
@@ -37,6 +44,7 @@ class _HomePageState extends State<HomePage>
         }
       });
     animationController.forward();
+    authStore.fetchUsername();
   }
 
   @override
@@ -97,12 +105,17 @@ class _HomePageState extends State<HomePage>
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        "Anurag Kanade",
-                        style: GoogleFonts.solway(
-                          fontSize: 15.sp,
-                        ),
-                      ),
+                      child: Observer(builder: (_) {
+                        Logger logger = Logger();
+                        logger.d("Home username:- ${authStore.username.value}");
+                        return Text(
+                          authStore.username.value,
+                          style: GoogleFonts.solway(
+                            fontSize: 15.sp,
+                            color: Colors.black,
+                          ),
+                        );
+                      }),
                     ),
                     SizedBox(height: 2.h),
                     Padding(
@@ -177,7 +190,7 @@ class _HomePageState extends State<HomePage>
                   child: Container(
                     height: 15.h,
                     width: 15.h,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
@@ -189,11 +202,57 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
                 Center(
-                  child: Text(
-                    "Clock In",
-                    style: GoogleFonts.solway(
-                      fontSize: 20.sp,
-                      color: Colors.white,
+                  child: InkWell(
+                    radius: 5,
+                    splashColor: Colors.white.withOpacity(0.5),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Center(
+                              child: Text(
+                                "Select any one Check in option",
+                                style: GoogleFonts.solway(
+                                  fontSize: 10.sp,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            content: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Card(
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.punch_clock_rounded,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                Card(
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.qr_code_2_rounded,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      "Clock In",
+                      style: GoogleFonts.solway(
+                        fontSize: 20.sp,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -214,7 +273,6 @@ class MyCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (int value = 10; value >= 0; value--) {
-      // Increased loop count to 10
       circle(canvas, Rect.fromLTRB(0, 0, size.width, size.height),
           value + animationValue);
     }
@@ -222,10 +280,9 @@ class MyCustomPainter extends CustomPainter {
 
   void circle(Canvas canvas, Rect rect, double value) {
     Paint paint = Paint()
-      ..color = Colors.black.withOpacity(
-          (1 - (value / 5)).clamp(.0, 1)); // Adjusted opacity calculation
-    double radius = sqrt(pow(rect.width / 2, 2) + pow(rect.height / 2, 2)) *
-        (value / 5); // Adjusted radius calculation
+      ..color = Colors.black.withOpacity((1 - (value / 5)).clamp(.0, 1));
+    double radius =
+        sqrt(pow(rect.width / 2, 2) + pow(rect.height / 2, 2)) * (value / 5);
     canvas.drawCircle(rect.center, radius, paint);
   }
 

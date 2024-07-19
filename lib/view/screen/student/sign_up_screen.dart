@@ -99,7 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       child: SizedBox(
-                        height: 8.h,
+                        height: 7.h,
                         width: 100.w,
                         child: Stack(
                           children: [
@@ -142,17 +142,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
                                 focusColor: Colors.black,
-                                border: UnderlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(
-                                    color: Colors.white,
-                                  ),
-                                ),
                                 prefixIcon: const Icon(
                                   Icons.person,
                                   color: Colors.black,
                                 ),
                                 labelText: "Username",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                                 labelStyle: GoogleFonts.solway(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
@@ -169,7 +166,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       child: SizedBox(
-                        height: 8.h,
+                        height: 7.h,
                         width: 100.w,
                         child: Stack(
                           children: [
@@ -213,11 +210,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               },
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                                 focusColor: Colors.black,
-                                border: UnderlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white)),
                                 prefixIcon: const Icon(
                                   Icons.email,
                                   color: Colors.black,
@@ -239,7 +235,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       child: SizedBox(
-                        height: 8.h,
+                        height: 7.h,
                         width: 100.w,
                         child: Stack(
                           children: [
@@ -285,10 +281,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 textInputAction: TextInputAction.done,
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
-                                  border: UnderlineInputBorder(
+                                  border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
                                   ),
                                   prefixIcon: const Icon(
                                     Icons.key,

@@ -26,7 +26,14 @@ class _CheckRoleScreenState extends State<CheckRoleScreen> {
         future: FireStoreHelper.storeHelper.getUserRole(currentUser.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            );
           }
           if (snapshot.hasError ||
               !snapshot.hasData ||
@@ -38,10 +45,9 @@ class _CheckRoleScreenState extends State<CheckRoleScreen> {
           if (role == 'User') {
             return const HomeBottomNavigationScreen();
           } else if (role == 'Admin') {
-            return const THomePage(); // Replace THomePage with your admin home page widget
+            return const THomePage();
           } else {
-            return const Text(
-                'Unauthorized access'); // Handle other roles or unexpected cases
+            return const Text('Unauthorized access');
           }
         },
       );

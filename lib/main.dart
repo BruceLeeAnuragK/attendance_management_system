@@ -1,4 +1,5 @@
 import 'package:attendence_management_system/provider/get_store.dart';
+import 'package:attendence_management_system/view/screen/auth_checker_screen.dart';
 import 'package:attendence_management_system/view/screen/check_role_screen.dart';
 import 'package:attendence_management_system/view/screen/student/analytics_screen.dart';
 import 'package:attendence_management_system/view/screen/student/attendance_screen.dart';
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
           useMaterial3: true,
         ),
         initialRoute: MyRoutes.splashScreen,
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
               const HomeBottomNavigationScreen(),
           MyRoutes.splashScreen: (context) => const SplashScreen(),
           MyRoutes.checkRoleScreen: (context) => const CheckRoleScreen(),
+          MyRoutes.authCheckerScreen: (context) => const AuthCheckerScreen(),
           MyRoutes.login: (context) => const LoginScreen(),
           MyRoutes.signup: (context) => const SignUpScreen(),
           MyRoutes.attendanceScreen: (context) => const MyAttendance(),

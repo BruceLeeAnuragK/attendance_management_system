@@ -1,6 +1,7 @@
 class MyRoutes {
   static String splashScreen = "splash_screen";
   static String checkRoleScreen = "check_role_screen";
+  static String authCheckerScreen = "check_role_screen";
   static String login = "login_screen";
   static String signup = "signup_screen";
   static String homepage = "home_screen";

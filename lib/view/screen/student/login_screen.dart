@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       child: SizedBox(
-                        height: 8.h,
+                        height: 7.h,
                         width: 100.w,
                         child: Stack(
                           children: [
@@ -142,10 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
                                 focusColor: Colors.black,
-                                border: UnderlineInputBorder(
+                                border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      const BorderSide(color: Colors.white),
                                 ),
                                 prefixIcon: const Icon(
                                   Icons.email,
@@ -168,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
                       child: SizedBox(
-                        height: 8.h,
+                        height: 7.h,
                         width: 100.w,
                         child: Stack(
                           children: [
@@ -212,10 +210,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 textInputAction: TextInputAction.done,
                                 decoration: InputDecoration(
                                   focusColor: Colors.black,
-                                  border: UnderlineInputBorder(
+                                  border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
                                   ),
                                   prefixIcon: const Icon(
                                     Icons.lock,

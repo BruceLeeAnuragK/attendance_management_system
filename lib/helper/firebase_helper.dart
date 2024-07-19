@@ -18,11 +18,20 @@ class FireStoreHelper {
   String colEmail = "email";
   String colPassword = "password";
   String colRole = "role";
+  String colAttendance = "attendance";
 
   String hashPassword(String password) {
     final bytes = utf8.encode(password);
     final hashed = sha256.convert(bytes);
     return hashed.toString();
+  }
+
+  getUserCredentials({required UserModel userModel}) async {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: userModel.email,
+      password: userModel.password,
+    );
   }
 
   Future<void> signUp(
@@ -48,6 +57,13 @@ class FireStoreHelper {
             .collection(collection)
             .doc(userCredential.user!.uid)
             .set(data);
+
+        await firestore
+            .collection(collection)
+            .doc(userCredential.user!.uid)
+            .collection("attendance")
+            .doc(userCredential.user!.uid)
+            .set({'checkIn': DateTime.now(), 'checkout': DateTime.now()});
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -76,5 +92,35 @@ class FireStoreHelper {
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserRole(String userId) {
     return firestore.collection(collection).doc(userId).get();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getUserAttendance(String userId) {
+    return firestore
+        .collection(collection)
+        .doc(userId)
+        .collection(colAttendance)
+        .snapshots();
+  }
+
+  Future<void> addAttendanceRecord(String userId, DateTime checkIn) async {
+    await firestore
+        .collection(collection)
+        .doc(userId)
+        .collection(colAttendance)
+        .doc(userId)
+        .update({
+      'checkIn': checkIn.toString(),
+    });
+  }
+
+  Future<void> removeAttendanceRecord(String userId, DateTime checkIn) async {
+    await firestore
+        .collection(collection)
+        .doc(userId)
+        .collection(colAttendance)
+        .doc(userId)
+        .update({
+      'checkout': checkIn.toString(),
+    });
   }
 }

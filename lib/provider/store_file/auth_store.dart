@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:attendence_management_system/helper/auth_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
 import 'package:mobx/mobx.dart';
@@ -62,14 +64,22 @@ class AuthStore with Store {
     }
   }
 
-  @action
   Future<void> fetchUsername() async {
     try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc('yourUserId') // Replace with the actual user ID
-          .get();
-      username = userDoc['username'];
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+
+      if (currentUser != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+        logger.d("UId :-${currentUser.uid}");
+        runInAction(() {
+          username.value = userDoc['username'];
+        });
+      } else {
+        logger.e('No user is currently logged in');
+      }
     } catch (e) {
       logger.e('Failed to fetch username: $e');
     }
