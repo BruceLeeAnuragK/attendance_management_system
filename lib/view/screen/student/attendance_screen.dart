@@ -33,13 +33,7 @@ class _MyAttendanceState extends State<MyAttendance> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: Container(),
         title: Text(
           "My Attendance",
           style: GoogleFonts.solway(),

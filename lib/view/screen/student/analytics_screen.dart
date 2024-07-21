@@ -38,13 +38,7 @@ class _MyAnalyticsScreenState extends State<MyAnalyticsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
-            ),
-            onPressed: () {},
-          ),
+          leading: Container(),
           title: Text(
             "My Analytics",
             style: GoogleFonts.solway(),

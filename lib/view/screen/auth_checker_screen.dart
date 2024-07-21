@@ -1,4 +1,4 @@
-import 'package:attendence_management_system/view/screen/student/home/home_bottom_navigation_screen.dart';
+import 'package:attendence_management_system/view/screen/check_role_screen.dart';
 import 'package:attendence_management_system/view/screen/student/login_screen.dart';
 import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,7 +39,7 @@ class _AuthCheckerScreenState extends State<AuthCheckerScreen> {
               } else if (userSnapshot.hasError) {
                 return const Text('Error loading user data');
               } else if (userSnapshot.hasData && userSnapshot.data!.exists) {
-                return const HomeBottomNavigationScreen();
+                return const CheckRoleScreen();
               } else {
                 return const SignUpScreen();
               }

@@ -34,4 +34,12 @@ class ProfileStore with Store {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('profile_image', path);
   }
+
+  Future<void> removeImage() async {
+    runInAction(() async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('profile_image');
+      profileImage.value = null;
+    });
+  }
 }

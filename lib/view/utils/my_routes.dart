@@ -10,4 +10,5 @@ class MyRoutes {
   static String attendanceScreen = "attendance_screen";
   static String analyticsScreen = "analytics_screen";
   static String profile = "user_profile_screen";
+  static String editProfile = "edit_profile_screen";
 }

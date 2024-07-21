@@ -25,43 +25,45 @@ class _CheckRoleScreenState extends State<CheckRoleScreen> {
     if (currentUser == null) {
       return const SignUpScreen();
     } else {
-      return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: authStore.checkUserRole(currentUser.uid),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                  backgroundColor: Colors.white,
+      return Builder(builder: (_) {
+        return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          future: authStore.checkUserRole(currentUser.uid),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.black,
+                    backgroundColor: Colors.white,
+                  ),
                 ),
-              ),
-            );
-          }
-          if (snapshot.hasError ||
-              !snapshot.hasData ||
-              !snapshot.data!.exists) {
-            return const Scaffold(
-              body: Center(
-                child: Text('Error loading user role'),
-              ),
-            );
-          }
+              );
+            }
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                !snapshot.data!.exists) {
+              return const Scaffold(
+                body: Center(
+                  child: Text('Error loading user role'),
+                ),
+              );
+            }
 
-          String role = snapshot.data!.data()!['role'];
-          if (role == 'User') {
-            return const HomeBottomNavigationScreen();
-          } else if (role == 'Admin') {
-            return const THomePage();
-          } else {
-            return const Scaffold(
-              body: Center(
-                child: Text('Unauthorized access'),
-              ),
-            );
-          }
-        },
-      );
+            String role = snapshot.data!.data()!['role'];
+            if (role == 'User') {
+              return const HomeBottomNavigationScreen();
+            } else if (role == 'Admin') {
+              return const THomePage();
+            } else {
+              return const Scaffold(
+                body: Center(
+                  child: Text('Unauthorized access'),
+                ),
+              );
+            }
+          },
+        );
+      });
     }
   }
 }

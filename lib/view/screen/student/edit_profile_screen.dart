@@ -10,23 +10,68 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../provider/get_store.dart';
+import '../../../provider/store_file/profile_store.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 final AuthStore authStore = getIt<AuthStore>();
 final PasswordStore passwordStore = getIt<PasswordStore>();
+final ProfileStore profileStore = getIt<ProfileStore>();
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  final _editformKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: Text(
+          "Attendance App",
+          style: GoogleFonts.solway(),
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Observer(builder: (context) {
+              if (profileStore.profileImage.value != null) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pushNamed(MyRoutes.profile);
+                  },
+                  child: Container(
+                    height: 5.h,
+                    width: 5.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: FileImage(profileStore.profileImage.value!),
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(MyRoutes.profile);
+                  },
+                  icon: const Icon(
+                    Icons.person,
+                    color: Colors.black,
+                  ),
+                );
+              }
+            }),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -89,7 +134,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             Form(
-              key: _formKey,
+              key: _editformKey,
               child: Column(
                 children: [
                   const SizedBox(
@@ -138,7 +183,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 }
                                 return null;
                               },
-                              controller: authStore.usernameController,
+                              initialValue: authStore.username.value,
+                              onChanged: (val) {
+                                authStore.updateUsername(val);
+                              },
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
                                 focusColor: Colors.black,
@@ -197,7 +245,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                             TextFormField(
-                              controller: authStore.emailController,
+                              initialValue: authStore.email.value,
+                              onChanged: (val) {
+                                authStore.updateEmail(val);
+                              },
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter an email';
@@ -386,41 +437,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     );
                   }),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "If already Registered then,",
-                        style: GoogleFonts.solway(
-                          color: Colors.black,
-                          fontSize: 10.sp,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(MyRoutes.login);
-                        },
-                        child: Text(
-                          "Login",
-                          style: GoogleFonts.solway(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            fontSize: 10.sp,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+
                   MaterialButton(
                     onPressed: () async {
-                      if (_formKey.currentState?.validate() ?? false) {
+                      if (_editformKey.currentState?.validate() ?? false) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Processing Data')),
                         );
-                        authStore.signUp().then((value) => Navigator.of(context)
-                            .pushReplacementNamed(MyRoutes.checkRoleScreen));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -460,7 +483,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  "SIGN UP",
+                                  "Edit",
                                   style: GoogleFonts.solway(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,

@@ -23,6 +23,7 @@ class AuthStore with Store {
 
   Observable<String> username = Observable('');
   Observable<String> email = Observable('');
+  Observable<String> role = Observable('');
   Observable<DateTime?> checkInTime = Observable(null);
   Observable<DateTime?> checkOutTime = Observable(null);
   Observable<List<Map<String, dynamic>>> dailyAttendanceRecords =
@@ -62,6 +63,10 @@ class AuthStore with Store {
 
   void logInUser(UserModel userModel) async {
     await FireStoreHelper.storeHelper.logIn(userModel: userModel);
+  }
+
+  Future<void> logOut() async {
+    await AuthHelper.authHelper.logOut();
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> checkUserRole(
@@ -110,6 +115,27 @@ class AuthStore with Store {
         logger.d("UId :-${currentUser.uid}");
         runInAction(() {
           email.value = userDoc['email'];
+        });
+      } else {
+        logger.e('No user is currently logged in');
+      }
+    } catch (e) {
+      logger.e('Failed to fetch username: $e');
+    }
+  }
+
+  Future<void> fetchRole() async {
+    try {
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+
+      if (currentUser != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+        logger.d("UId :-${currentUser.uid}");
+        runInAction(() {
+          role.value = userDoc['role'];
         });
       } else {
         logger.e('No user is currently logged in');
@@ -249,5 +275,81 @@ class AuthStore with Store {
     runInAction(() {
       selectedMonth.value = month;
     });
+  }
+
+  Future<void> updateUsername(String newUsername) async {
+    try {
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+      if (currentUser != null) {
+        await firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'username': newUsername});
+        runInAction(() {
+          username.value = newUsername;
+        });
+      } else {
+        logger.e('No user is currently logged in');
+      }
+    } catch (e) {
+      logger.e('Failed to update username: $e');
+    }
+  }
+
+  Future<void> updateEmail(String newEmail) async {
+    try {
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+      if (currentUser != null) {
+        await currentUser.updateEmail(newEmail);
+        await firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'email': newEmail});
+        runInAction(() {
+          email.value = newEmail;
+        });
+      } else {
+        logger.e('No user is currently logged in');
+      }
+    } catch (e) {
+      logger.e('Failed to update email: $e');
+    }
+  }
+
+  Future<void> updateRole(String newRole) async {
+    try {
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+      if (currentUser != null) {
+        await firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'role': newRole});
+        runInAction(() {
+          role.value = newRole;
+        });
+      } else {
+        logger.e('No user is currently logged in');
+      }
+    } catch (e) {
+      logger.e('Failed to update role: $e');
+    }
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+      if (currentUser != null) {
+        await currentUser.updatePassword(newPassword);
+        String hashedPassword = hashPassword(newPassword);
+        await firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .update({'password': hashedPassword});
+      } else {
+        logger.e('No user is currently logged in');
+      }
+    } catch (e) {
+      logger.e('Failed to update password: $e');
+    }
   }
 }
