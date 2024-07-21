@@ -9,4 +9,5 @@ class MyRoutes {
   static String bottomNavigation = "home_bottom_navigation_screen";
   static String attendanceScreen = "attendance_screen";
   static String analyticsScreen = "analytics_screen";
+  static String profile = "user_profile_screen";
 }

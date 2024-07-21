@@ -26,14 +26,6 @@ class FireStoreHelper {
     return hashed.toString();
   }
 
-  getUserCredentials({required UserModel userModel}) async {
-    UserCredential userCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: userModel.email,
-      password: userModel.password,
-    );
-  }
-
   Future<void> signUp(
       {required UserModel userModel, required String role}) async {
     try {
@@ -94,33 +86,104 @@ class FireStoreHelper {
     return firestore.collection(collection).doc(userId).get();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getUserAttendance(String userId) {
-    return firestore
-        .collection(collection)
-        .doc(userId)
-        .collection(colAttendance)
-        .snapshots();
-  }
-
   Future<void> addAttendanceRecord(String userId, DateTime checkIn) async {
-    await firestore
+    final attendanceDoc = firestore
         .collection(collection)
         .doc(userId)
         .collection(colAttendance)
-        .doc(userId)
-        .update({
-      'checkIn': checkIn.toString(),
-    });
+        .doc(userId);
+
+    final docSnapshot = await attendanceDoc.get();
+
+    if (docSnapshot.exists) {
+      await attendanceDoc.update({
+        'checkIn': checkIn,
+      });
+    } else {
+      await attendanceDoc.set({
+        'checkIn': checkIn,
+      });
+    }
   }
 
-  Future<void> removeAttendanceRecord(String userId, DateTime checkIn) async {
-    await firestore
+  Future<DateTime?> getLatestCheckInTime(String userId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await firestore
+          .collection(collection)
+          .doc(userId)
+          .collection(colAttendance)
+          .doc(userId)
+          .get();
+      if (snapshot.exists) {
+        Map<String, dynamic>? data = snapshot.data();
+        if (data != null && data.containsKey('checkIn')) {
+          return (data['checkIn'] as Timestamp).toDate();
+        }
+      }
+    } catch (e) {
+      print("Error fetching latest check-in time: $e");
+    }
+    return null;
+  }
+
+  Future<void> addCheckoutRecord(String userId, DateTime checkOut) async {
+    final attendanceDoc = firestore
         .collection(collection)
         .doc(userId)
         .collection(colAttendance)
-        .doc(userId)
-        .update({
-      'checkout': checkIn.toString(),
-    });
+        .doc(userId);
+
+    try {
+      await attendanceDoc.update({
+        'checkout': checkOut,
+      });
+    } catch (e) {
+      // If the document does not exist, create it
+      await attendanceDoc.set({
+        'checkout': checkOut,
+      });
+    }
+  }
+
+  Future<DateTime?> getLatestCheckOutTime(String userId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await firestore
+          .collection(collection)
+          .doc(userId)
+          .collection(colAttendance)
+          .doc(userId)
+          .get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic>? data = snapshot.data();
+        if (data != null && data.containsKey('checkout')) {
+          return (data['checkout'] as Timestamp).toDate();
+        }
+      }
+    } catch (e) {
+      print("Error fetching latest check-out time: $e");
+    }
+    return null;
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getAttendanceRecordsForMonth(
+      String userId, DateTime selectedMonth) async {
+    try {
+      DateTime startOfMonth =
+          DateTime(selectedMonth.year, selectedMonth.month, 1);
+      DateTime endOfMonth =
+          DateTime(selectedMonth.year, selectedMonth.month + 1, 0, 23, 59, 59);
+
+      return firestore
+          .collection('users')
+          .doc(userId)
+          .collection('attendance')
+          .where('checkIn', isGreaterThanOrEqualTo: startOfMonth)
+          .where('checkIn', isLessThanOrEqualTo: endOfMonth)
+          .get();
+    } catch (e) {
+      print("Error fetching attendance records: $e");
+      rethrow;
+    }
   }
 }

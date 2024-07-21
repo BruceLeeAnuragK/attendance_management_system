@@ -8,6 +8,7 @@ import 'package:attendence_management_system/view/screen/student/home/home_scree
 import 'package:attendence_management_system/view/screen/student/login_screen.dart';
 import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
 import 'package:attendence_management_system/view/screen/student/splash_screen.dart';
+import 'package:attendence_management_system/view/screen/student/user_profile_screen.dart';
 import 'package:attendence_management_system/view/screen/teacher/home/home_paget.dart';
 import 'package:attendence_management_system/view/utils/my_routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,7 +29,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
@@ -52,6 +52,7 @@ class MyApp extends StatelessWidget {
           MyRoutes.signup: (context) => const SignUpScreen(),
           MyRoutes.attendanceScreen: (context) => const MyAttendance(),
           MyRoutes.analyticsScreen: (context) => const MyAnalyticsScreen(),
+          MyRoutes.profile: (context) => const ProfileScreen(),
         },
       );
     });

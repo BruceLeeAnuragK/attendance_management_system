@@ -1,3 +1,4 @@
+import 'package:attendence_management_system/provider/store_file/auth_store.dart';
 import 'package:attendence_management_system/view/screen/student/home/home_bottom_navigation_screen.dart';
 import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
 import 'package:attendence_management_system/view/screen/teacher/home/home_paget.dart';
@@ -6,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../helper/auth_helper.dart';
-import '../../helper/firebase_helper.dart';
+import '../../provider/get_store.dart';
 
 class CheckRoleScreen extends StatefulWidget {
   const CheckRoleScreen({Key? key}) : super(key: key);
@@ -16,6 +17,8 @@ class CheckRoleScreen extends StatefulWidget {
 }
 
 class _CheckRoleScreenState extends State<CheckRoleScreen> {
+  AuthStore authStore = getIt<AuthStore>();
+
   @override
   Widget build(BuildContext context) {
     User? currentUser = AuthHelper.authHelper.getCurrentUser();
@@ -23,7 +26,7 @@ class _CheckRoleScreenState extends State<CheckRoleScreen> {
       return const SignUpScreen();
     } else {
       return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FireStoreHelper.storeHelper.getUserRole(currentUser.uid),
+        future: authStore.checkUserRole(currentUser.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
@@ -38,7 +41,11 @@ class _CheckRoleScreenState extends State<CheckRoleScreen> {
           if (snapshot.hasError ||
               !snapshot.hasData ||
               !snapshot.data!.exists) {
-            return const Text('Error loading user role');
+            return const Scaffold(
+              body: Center(
+                child: Text('Error loading user role'),
+              ),
+            );
           }
 
           String role = snapshot.data!.data()!['role'];
@@ -47,7 +54,11 @@ class _CheckRoleScreenState extends State<CheckRoleScreen> {
           } else if (role == 'Admin') {
             return const THomePage();
           } else {
-            return const Text('Unauthorized access');
+            return const Scaffold(
+              body: Center(
+                child: Text('Unauthorized access'),
+              ),
+            );
           }
         },
       );

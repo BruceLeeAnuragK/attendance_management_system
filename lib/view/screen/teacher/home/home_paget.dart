@@ -26,7 +26,6 @@ class _THomePageState extends State<THomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Logger logger;
     return Scaffold(
       appBar: AppBar(
         title: Text("Teacher Home Page"),
