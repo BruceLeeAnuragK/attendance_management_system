@@ -9,6 +9,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 import '../../../../provider/store_file/profile_store.dart';
 
@@ -47,13 +48,13 @@ class _HomePageState extends State<HomePage>
         }
       });
     animationController.forward();
+    authStore.checkIfDayChanged();
     authStore.fetchUsername();
-    authStore.fetchCheckInTime();
-    authStore.fetchCheckOutTime();
     profileStore.loadImageFromPreferences();
     profileStore.loadImageFromPreferences();
     authStore.fetchEmail();
     authStore.fetchRole();
+    authStore.fetchCheckInAndOut();
   }
 
   @override
@@ -515,69 +516,90 @@ class _HomePageState extends State<HomePage>
                     radius: 5,
                     splashColor: Colors.white.withOpacity(0.5),
                     onTap: () {
-                      showDialog(
+                      showModalBottomSheet(
+                        backgroundColor: Colors.white,
                         context: context,
                         builder: (context) {
-                          return AlertDialog(
-                            title: Center(
-                              child: Text(
-                                "Select any one Check in option",
-                                style: GoogleFonts.solway(
-                                  fontSize: 10.sp,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            content: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Card(
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                      if (authStore.checkInTime.value == null) {
-                                        authStore.checkIn();
-                                        await authStore.fetchCheckInTime();
-                                      } else if (authStore.checkOutTime.value ==
-                                          null) {
-                                        authStore.checkOut();
-                                        await authStore.fetchCheckOutTime();
-                                      }
-                                    },
-                                    icon: Icon(
-                                      Icons.punch_clock_rounded,
+                          return authStore.checkOutTime.value == null
+                              ? Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Builder(
+                                      builder: (context) {
+                                        GlobalKey<SlideActionState> key =
+                                            GlobalKey();
+                                        return Container(
+                                          height: 100,
+                                          width: 80.w,
+                                          margin: EdgeInsets.all(5),
+                                          child: Observer(builder: (_) {
+                                            return SlideAction(
+                                              outerColor: Colors.white,
+                                              innerColor: Colors.black,
+                                              sliderButtonIcon: Icon(
+                                                Icons.punch_clock_rounded,
+                                                color: Colors.white,
+                                              ),
+                                              key: key,
+                                              text:
+                                                  authStore.checkInTime.value ==
+                                                          null
+                                                      ? "Clock In"
+                                                      : authStore.checkOutTime
+                                                                  .value ==
+                                                              null
+                                                          ? "Clock Out"
+                                                          : "Checked Out",
+                                              textStyle: GoogleFonts.solway(
+                                                color: Colors.black,
+                                                fontSize: 10.sp,
+                                              ),
+                                              onSubmit: () {
+                                                Navigator.of(context).pop();
+
+                                                authStore.checkInAndOut(
+                                                    key: key);
+                                                return authStore
+                                                    .fetchCheckInAndOut();
+                                              },
+                                            );
+                                          }),
+                                        );
+                                      },
+                                    )
+                                  ],
+                                )
+                              : Container(
+                                  margin: EdgeInsets.all(5),
+                                  alignment: Alignment.center,
+                                  height: 100,
+                                  width: 80.w,
+                                  child: Text(
+                                    "You have Completed this Day",
+                                    style: GoogleFonts.solway(
+                                      fontSize: 10.sp,
                                       color: Colors.black,
                                     ),
                                   ),
-                                ),
-                                Card(
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.qr_code_2_rounded,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                                );
                         },
                       );
                     },
-                    child: Text(
-                      authStore.checkInTime.value == null
-                          ? "Clock In"
-                          : authStore.checkOutTime.value == null
-                              ? "Clock Out"
-                              : "Checked Out",
-                      style: GoogleFonts.solway(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: Observer(builder: (_) {
+                      return Text(
+                        authStore.checkInTime.value == null
+                            ? "Clock In"
+                            : authStore.checkOutTime.value == null
+                                ? "Clock Out"
+                                : "Checked Out",
+                        style: GoogleFonts.solway(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      );
+                    }),
                   ),
                 ),
               ],

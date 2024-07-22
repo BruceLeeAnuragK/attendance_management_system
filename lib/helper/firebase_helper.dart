@@ -3,6 +3,10 @@ import 'dart:convert'; // for the utf8.encode method
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 import '../model/user_model.dart';
 import 'auth_helper.dart';
@@ -49,13 +53,6 @@ class FireStoreHelper {
             .collection(collection)
             .doc(userCredential.user!.uid)
             .set(data);
-
-        await firestore
-            .collection(collection)
-            .doc(userCredential.user!.uid)
-            .collection("attendance")
-            .doc(userCredential.user!.uid)
-            .set({'checkIn': DateTime.now(), 'checkout': DateTime.now()});
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -86,84 +83,10 @@ class FireStoreHelper {
     return firestore.collection(collection).doc(userId).get();
   }
 
-  Future<void> addAttendanceRecord(String userId, DateTime checkIn) async {
-    final attendanceDoc = firestore
-        .collection(collection)
-        .doc(userId)
-        .collection(colAttendance)
-        .doc(userId);
-
-    final docSnapshot = await attendanceDoc.get();
-
-    if (docSnapshot.exists) {
-      await attendanceDoc.update({
-        'checkIn': checkIn,
-      });
-    } else {
-      await attendanceDoc.set({
-        'checkIn': checkIn,
-      });
-    }
-  }
-
-  Future<DateTime?> getLatestCheckInTime(String userId) async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await firestore
-          .collection(collection)
-          .doc(userId)
-          .collection(colAttendance)
-          .doc(userId)
-          .get();
-      if (snapshot.exists) {
-        Map<String, dynamic>? data = snapshot.data();
-        if (data != null && data.containsKey('checkIn')) {
-          return (data['checkIn'] as Timestamp).toDate();
-        }
-      }
-    } catch (e) {
-      print("Error fetching latest check-in time: $e");
-    }
-    return null;
-  }
-
-  Future<void> addCheckoutRecord(String userId, DateTime checkOut) async {
-    final attendanceDoc = firestore
-        .collection(collection)
-        .doc(userId)
-        .collection(colAttendance)
-        .doc(userId);
-
-    try {
-      await attendanceDoc.update({
-        'checkout': checkOut,
-      });
-    } catch (e) {
-      // If the document does not exist, create it
-      await attendanceDoc.set({
-        'checkout': checkOut,
-      });
-    }
-  }
-
-  Future<DateTime?> getLatestCheckOutTime(String userId) async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await firestore
-          .collection(collection)
-          .doc(userId)
-          .collection(colAttendance)
-          .doc(userId)
-          .get();
-
-      if (snapshot.exists) {
-        Map<String, dynamic>? data = snapshot.data();
-        if (data != null && data.containsKey('checkout')) {
-          return (data['checkout'] as Timestamp).toDate();
-        }
-      }
-    } catch (e) {
-      print("Error fetching latest check-out time: $e");
-    }
-    return null;
+  Future<List<UserModel>> fetchAllUsers() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await firestore.collection(collection).get();
+    return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getAttendanceRecordsForMonth(
@@ -184,6 +107,49 @@ class FireStoreHelper {
     } catch (e) {
       print("Error fetching attendance records: $e");
       rethrow;
+    }
+  }
+
+  Future<void> checkInAndOut({required GlobalKey<SlideActionState> key}) async {
+    Logger logger = Logger();
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    String time = DateFormat('HH-mm-ss').format(DateTime.now());
+    User? currentUser = AuthHelper.authHelper.getCurrentUser();
+
+    DocumentSnapshot snapshot2 = await firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('attendance')
+        .doc(today)
+        .get();
+
+    if (snapshot2.exists) {
+      try {
+        Timestamp checkinTimestamp = snapshot2['checkIn'];
+        await firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('attendance')
+            .doc(today)
+            .update({
+          'checkIn': checkinTimestamp,
+          'checkout': FieldValue.serverTimestamp()
+        });
+      } catch (e) {
+        logger.e("Error updating checkout time: ${e}");
+      }
+    } else {
+      try {
+        await firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('attendance')
+            .doc(today)
+            .set({'checkIn': FieldValue.serverTimestamp()});
+        key.currentState?.reset();
+      } catch (e) {
+        logger.e("Error setting checkin time: ${e}");
+      }
     }
   }
 }

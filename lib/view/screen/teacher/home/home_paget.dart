@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:logger/logger.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../provider/get_store.dart';
@@ -17,16 +16,18 @@ class THomePage extends StatefulWidget {
   State<THomePage> createState() => _THomePageState();
 }
 
-class _THomePageState extends State<THomePage> {
+class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
   final AuthStore authStore = getIt<AuthStore>();
 
   final ProfileStore profileStore = getIt<ProfileStore>();
 
+  late TabController tabController;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    authStore.fetchUsername();
+    tabController = TabController(length: 2, vsync: this);
+    authStore.fetchAllUsers();
   }
 
   @override
@@ -245,6 +246,28 @@ class _THomePageState extends State<THomePage> {
           style: GoogleFonts.solway(),
         ),
         centerTitle: true,
+        bottom: TabBar(
+          indicatorColor: Colors.black,
+          controller: tabController,
+          tabs: [
+            Text(
+              "Admins",
+              style: GoogleFonts.solway(
+                color: Colors.black,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "Users",
+              style: GoogleFonts.solway(
+                color: Colors.black,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(10),
@@ -281,19 +304,74 @@ class _THomePageState extends State<THomePage> {
           ),
         ],
       ),
-      body: Center(
-        child: Observer(builder: (_) {
-          Logger logger = Logger();
-          logger.t("Username of Admin :- ${authStore.username.value}");
-          return Text(
-            authStore.username.value,
-            style: GoogleFonts.solway(
-              color: Colors.black,
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          );
-        }),
+      body: TabBarView(
+        controller: tabController,
+        children: [
+          Observer(
+            builder: (_) {
+              return ListView.builder(
+                itemCount: authStore.adminUsers.length,
+                itemBuilder: (context, index) {
+                  final admin = authStore.adminUsers[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      height: 15.h,
+                      width: 30.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.bottomLeft,
+                          colors: [
+                            Colors.grey.withOpacity(0.5),
+                            Colors.white.withOpacity(0.99),
+                          ],
+                        ),
+                      ),
+                      child: ListTile(
+                        title: Text(admin.username),
+                        subtitle: Text(admin.email),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          Observer(
+            builder: (_) {
+              return ListView.builder(
+                itemCount: authStore.normalUsers.length,
+                itemBuilder: (context, index) {
+                  final user = authStore.normalUsers[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      height: 15.h,
+                      width: 30.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.bottomLeft,
+                          colors: [
+                            Colors.grey.withOpacity(0.5),
+                            Colors.white.withOpacity(0.99),
+                          ],
+                        ),
+                      ),
+                      child: ListTile(
+                        title: Text(user.username),
+                        subtitle: Text(user.email),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
     );
   }

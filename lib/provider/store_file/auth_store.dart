@@ -1,13 +1,16 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:attendence_management_system/helper/auth_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:mobx/mobx.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 import '../../helper/firebase_helper.dart';
 import '../../model/user_model.dart';
@@ -28,6 +31,10 @@ class AuthStore with Store {
   Observable<DateTime?> checkOutTime = Observable(null);
   Observable<List<Map<String, dynamic>>> dailyAttendanceRecords =
       Observable([]);
+  ObservableList<UserModel> adminUsers = ObservableList<UserModel>();
+
+  @observable
+  ObservableList<UserModel> normalUsers = ObservableList<UserModel>();
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -145,72 +152,6 @@ class AuthStore with Store {
     }
   }
 
-  Future<void> checkIn() async {
-    runInAction(() async {
-      try {
-        User? currentUser = AuthHelper.authHelper.getCurrentUser();
-        if (currentUser != null) {
-          await FireStoreHelper.storeHelper
-              .addAttendanceRecord(currentUser.uid, DateTime.now());
-          logger.d('Check-in successful');
-        } else {
-          logger.e('No user is currently logged in');
-        }
-      } catch (e) {
-        logger.e('Check-in failed: $e');
-      }
-    });
-  }
-
-  Future<void> fetchCheckInTime() async {
-    try {
-      User? currentUser = AuthHelper.authHelper.getCurrentUser();
-      if (currentUser != null) {
-        DateTime? checkIn = await FireStoreHelper.storeHelper
-            .getLatestCheckInTime(currentUser.uid);
-        runInAction(() {
-          checkInTime.value = checkIn;
-        });
-      } else {
-        logger.e('No user is currently logged in');
-      }
-    } catch (e) {
-      logger.e('Failed to fetch check-in time: $e');
-    }
-  }
-
-  Future<void> checkOut() async {
-    try {
-      User? currentUser = AuthHelper.authHelper.getCurrentUser();
-      if (currentUser != null) {
-        await FireStoreHelper.storeHelper
-            .addCheckoutRecord(currentUser.uid, DateTime.now());
-        logger.d('Check-out successful');
-      } else {
-        logger.e('No user is currently logged in');
-      }
-    } catch (e) {
-      logger.e('Check-out failed: $e');
-    }
-  }
-
-  Future<void> fetchCheckOutTime() async {
-    try {
-      User? currentUser = AuthHelper.authHelper.getCurrentUser();
-      if (currentUser != null) {
-        DateTime? checkOut = await FireStoreHelper.storeHelper
-            .getLatestCheckOutTime(currentUser.uid);
-        runInAction(() {
-          checkOutTime.value = checkOut;
-        });
-      } else {
-        logger.e('No user is currently logged in');
-      }
-    } catch (e) {
-      logger.e('Failed to fetch check-out time: $e');
-    }
-  }
-
   Future<void> fetchDailyAttendanceRecords(
       {required String userId, required DateTime selectedMonth}) async {
     try {
@@ -239,27 +180,6 @@ class AuthStore with Store {
 
   Observable<String> selectedMonth =
       Observable(DateFormat('MMMM yyyy').format(DateTime.now()));
-
-  Future<void> fetchAttendanceRecords(String userId) async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
-          .collection('users')
-          .doc(userId)
-          .collection('attendance')
-          .where('date', isGreaterThanOrEqualTo: _startOfMonth())
-          .where('date', isLessThanOrEqualTo: _endOfMonth())
-          .get();
-
-      List<Map<String, dynamic>> records =
-          snapshot.docs.map((doc) => doc.data()).toList();
-
-      runInAction(() {
-        dailyAttendanceRecords.value = records;
-      });
-    } catch (e) {
-      logger.e('Failed to fetch attendance records: $e');
-    }
-  }
 
   DateTime _startOfMonth() {
     DateTime now = DateTime.now();
@@ -350,6 +270,100 @@ class AuthStore with Store {
       }
     } catch (e) {
       logger.e('Failed to update password: $e');
+    }
+  }
+
+  void checkIfDayChanged() {
+    DateTime now = DateTime.now();
+    if (checkInTime.value != null && !isSameDay(checkInTime.value!, now)) {
+      runInAction(() {
+        checkInTime.value = null;
+        checkOutTime.value = null;
+      });
+    }
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  checkInAndOut({required GlobalKey<SlideActionState> key}) {
+    FireStoreHelper.storeHelper.checkInAndOut(key: key);
+  }
+
+  fetchCheckInAndOut() async {
+    try {
+      String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      User? currentUser = AuthHelper.authHelper.getCurrentUser();
+      DocumentSnapshot snapshot2 = await firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .collection('attendance')
+          .doc(today)
+          .get();
+
+      runInAction(() {
+        if (snapshot2.exists) {
+          Timestamp? checkinTimestamp = snapshot2['checkIn'];
+          Timestamp? checkoutTimestamp = snapshot2['checkout'];
+          checkInTime.value = checkinTimestamp?.toDate();
+          checkOutTime.value = checkoutTimestamp?.toDate();
+          logger.d("CheckIn :- fetched ${checkInTime.value}");
+          logger.d("CheckOut :- fetched ${checkOutTime.value}");
+        } else {
+          checkInTime.value = null;
+          checkOutTime.value = null;
+          logger.d("CheckIn :- No record for today");
+          logger.d("CheckOut :- No record for today");
+        }
+      });
+    } catch (e) {
+      runInAction(() {
+        checkInTime.value = null;
+        checkOutTime.value = null;
+        logger.e("Error fetching CheckIn/CheckOut :- ${e}");
+      });
+    }
+  }
+
+  Future<void> fetchAttendanceRecords(String userId) async {
+    DateTime selectedDate = DateFormat('MMMM yyyy').parse(selectedMonth.value);
+    DateTime startOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
+    DateTime endOfMonth =
+        DateTime(selectedDate.year, selectedDate.month + 1, 0, 23, 59, 59);
+
+    log("Start Month : $startOfMonth");
+    log("End Month : $endOfMonth");
+
+    QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
+        .collection('users')
+        .doc(userId)
+        .collection('attendance')
+        .where('checkIn',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
+        .where('checkIn', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+        .get();
+
+    runInAction(() {
+      dailyAttendanceRecords.value.clear();
+      snapshot.docs.forEach((doc) {
+        dailyAttendanceRecords.value.add(doc.data());
+      });
+    });
+  }
+
+  Future<void> fetchAllUsers() async {
+    List<UserModel> users = await FireStoreHelper.storeHelper.fetchAllUsers();
+    adminUsers.clear();
+    normalUsers.clear();
+    for (var user in users) {
+      if (user.role == 'Admin') {
+        adminUsers.add(user);
+      } else {
+        normalUsers.add(user);
+      }
     }
   }
 }

@@ -59,6 +59,8 @@ dependencies:
   image_picker:
   shared_preferences:
   path_provider:
+  slide_to_act:
+  slide_action:
 
 
 dev_dependencies:
