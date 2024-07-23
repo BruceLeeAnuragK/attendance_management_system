@@ -113,7 +113,9 @@ class _HomePageState extends State<HomePage>
               child: Row(
                 children: [
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(MyRoutes.editProfile);
+                    },
                     child: Container(
                       alignment: Alignment.center,
                       height: 5.h,
@@ -161,7 +163,7 @@ class _HomePageState extends State<HomePage>
                         authStore.email.value,
                         style: GoogleFonts.solway(
                           color: Colors.blue,
-                          fontSize: 15.sp,
+                          fontSize: 10.sp,
                         ),
                       );
                     },
@@ -556,10 +558,10 @@ class _HomePageState extends State<HomePage>
                                                 fontSize: 10.sp,
                                               ),
                                               onSubmit: () {
-                                                Navigator.of(context).pop();
-
                                                 authStore.checkInAndOut(
                                                     key: key);
+                                                Navigator.of(context).pop();
+
                                                 return authStore
                                                     .fetchCheckInAndOut();
                                               },

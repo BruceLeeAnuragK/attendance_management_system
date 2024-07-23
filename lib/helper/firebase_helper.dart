@@ -18,6 +18,7 @@ class FireStoreHelper {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   String collection = "users";
+  String colId = "id";
   String colUsername = "username";
   String colEmail = "email";
   String colPassword = "password";
@@ -43,6 +44,7 @@ class FireStoreHelper {
         String hashedPassword = hashPassword(userModel.password);
 
         Map<String, dynamic> data = {
+          colId: userModel.id,
           colUsername: userModel.username,
           colEmail: userModel.email,
           colPassword: hashedPassword,
@@ -86,7 +88,9 @@ class FireStoreHelper {
   Future<List<UserModel>> fetchAllUsers() async {
     QuerySnapshot<Map<String, dynamic>> snapshot =
         await firestore.collection(collection).get();
-    return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+        .toList();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getAttendanceRecordsForMonth(
@@ -150,6 +154,27 @@ class FireStoreHelper {
       } catch (e) {
         logger.e("Error setting checkin time: ${e}");
       }
+    }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getAttendanceRecordsForWeek(
+      String userId, DateTime selectedWeek) async {
+    try {
+      DateTime startOfWeek =
+          selectedWeek.subtract(Duration(days: selectedWeek.weekday - 1));
+      DateTime endOfWeek = startOfWeek.add(Duration(days: 6));
+
+      return firestore
+          .collection('users')
+          .doc(userId)
+          .collection('attendance')
+          .where('checkIn',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(startOfWeek))
+          .where('checkIn', isLessThanOrEqualTo: Timestamp.fromDate(endOfWeek))
+          .get();
+    } catch (e) {
+      print("Error fetching weekly attendance records: $e");
+      rethrow;
     }
   }
 }

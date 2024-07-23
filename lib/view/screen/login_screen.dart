@@ -1,28 +1,28 @@
 import 'dart:ui';
 
-import 'package:attendence_management_system/provider/store_file/auth_store.dart';
 import 'package:attendence_management_system/provider/store_file/password_store.dart';
-import 'package:attendence_management_system/view/utils/my_routes.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../provider/get_store.dart';
+import '../../helper/auth_helper.dart';
+import '../../model/user_model_2.dart';
+import '../utils/my_routes.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-final AuthStore authStore = getIt<AuthStore>();
-final PasswordStore passwordStore = getIt<PasswordStore>();
-
-class _SignUpScreenState extends State<SignUpScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final PasswordStore passwordStore = GetIt.instance<PasswordStore>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           children: [
             ClipRRect(
               child: SizedBox(
-                height: 40.h,
+                height: 50.h,
                 width: 100.w,
                 child: Stack(
                   children: [
@@ -44,8 +44,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                              image: AssetImage("assets/images/clockgif.gif"),
-                              fit: BoxFit.fitWidth),
+                            image: AssetImage("assets/images/clockgif.gif"),
+                            fit: BoxFit.fitWidth,
+                          ),
                         ),
                       ),
                     ),
@@ -77,11 +78,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       left: 110,
                       top: 30.h,
                       child: Text(
-                        "Sign Up",
+                        "Log In",
                         style: GoogleFonts.solway(
-                            color: Colors.black,
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -92,9 +94,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: ClipRRect(
@@ -123,81 +123,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     Colors.grey.withOpacity(0.4),
                                     Colors.white.withOpacity(0.1),
                                     Colors.grey.withOpacity(0.4),
-                                    // Colors.grey.withOpacity(0.4),
-                                    // Colors.grey.withOpacity(0.1),
                                   ],
                                 ),
                               ),
                             ),
                             TextFormField(
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Username is required.";
-                                } else if (value.length <= 6) {
-                                  return "Username must be at least of 6 letters";
-                                }
-                                return null;
-                              },
-                              controller: authStore.usernameController,
-                              cursorColor: Colors.black,
-                              decoration: InputDecoration(
-                                focusColor: Colors.black,
-                                prefixIcon: const Icon(
-                                  Icons.person,
-                                  color: Colors.black,
-                                ),
-                                labelText: "Username",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                labelStyle: GoogleFonts.solway(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 12.sp,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ClipRRect(
-                      child: SizedBox(
-                        height: 7.h,
-                        width: 100.w,
-                        child: Stack(
-                          children: [
-                            BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 2,
-                                sigmaY: 2,
-                              ),
-                              child: Container(),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.2),
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.grey.withOpacity(0.4),
-                                    Colors.white.withOpacity(0.1),
-                                    Colors.grey.withOpacity(0.4),
-                                    // Colors.grey.withOpacity(0.4),
-                                    // Colors.grey.withOpacity(0.1),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            TextFormField(
-                              controller: authStore.emailController,
+                              controller: emailController,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter an email';
@@ -210,10 +141,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               },
                               cursorColor: Colors.black,
                               decoration: InputDecoration(
+                                focusColor: Colors.black,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                focusColor: Colors.black,
                                 prefixIcon: const Icon(
                                   Icons.email,
                                   color: Colors.black,
@@ -259,20 +190,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     Colors.grey.withOpacity(0.4),
                                     Colors.white.withOpacity(0.1),
                                     Colors.grey.withOpacity(0.4),
-                                    // Colors.grey.withOpacity(0.4),
-                                    // Colors.grey.withOpacity(0.1),
                                   ],
                                 ),
                               ),
                             ),
                             Observer(builder: (_) {
                               return TextFormField(
-                                controller: authStore.passwordController,
+                                controller: passwordController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return "The Password is very important for Authentication.";
-                                  } else if (value.length <= 6) {
-                                    return "The Password must be at least 6 character long.";
+                                    return "Please enter a password";
+                                  } else if (value.length < 6) {
+                                    return "Password must be at least 6 characters long";
                                   }
                                   return null;
                                 },
@@ -285,16 +214,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   prefixIcon: const Icon(
-                                    Icons.key,
+                                    Icons.lock,
                                     color: Colors.black,
                                   ),
                                   suffixIcon: IconButton(
-                                    icon: passwordStore.hide.value == true
-                                        ? const Icon(
-                                            Icons.visibility_off,
-                                            color: Colors.black,
-                                          )
-                                        : const Icon(Icons.visibility),
+                                    icon: Icon(
+                                      passwordStore.hide.value
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: Colors.black,
+                                    ),
                                     onPressed: () {
                                       passwordStore.hideOrShowPassword();
                                     },
@@ -313,85 +242,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
-                  //
-                  Observer(builder: (_) {
-                    return DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
-                        dropdownStyleData: DropdownStyleData(
-                          maxHeight: 200,
-                          width: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: Colors.white,
-                          ),
-                          offset: const Offset(-20, 0),
-                          scrollbarTheme: ScrollbarThemeData(
-                            radius: const Radius.circular(40),
-                            thickness: WidgetStateProperty.all<double>(6),
-                            thumbVisibility:
-                                WidgetStateProperty.all<bool>(true),
-                          ),
-                        ),
-                        buttonStyleData: ButtonStyleData(
-                          height: 50,
-                          width: 160,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.grey.withOpacity(0.1),
-                                Colors.white.withOpacity(0.9),
-                                Colors.grey.withOpacity(0.1),
-                              ],
-                            ),
-                          ),
-                          elevation: 2,
-                        ),
-                        isExpanded: true,
-                        hint: Row(
-                          children: [
-                            Text(
-                              'Select Role',
-                              style: GoogleFonts.solway(
-                                fontSize: 10.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-                        value: authStore.selectedRole.value,
-                        items: authStore.items.value
-                            .map(
-                              (String item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: GoogleFonts.solway(
-                                    fontSize: 10.sp,
-                                    color: Colors.black,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (String? value) {
-                          authStore.selectRole(value: value!);
-                        },
-                      ),
-                    );
-                  }),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "If already Registered then,",
+                        "If not Registered then,",
                         style: GoogleFonts.solway(
                           color: Colors.black,
                           fontSize: 10.sp,
@@ -399,10 +255,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamed(MyRoutes.login);
+                          Navigator.of(context).pushNamed(MyRoutes.signup);
                         },
                         child: Text(
-                          "Login",
+                          "Sign up",
                           style: GoogleFonts.solway(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -415,17 +271,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   MaterialButton(
                     onPressed: () async {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Processing Data')),
+                      if (_formKey.currentState!.validate()) {
+                        UserModel2 userModel = UserModel2(
+                          email: emailController.text.trim(),
+                          password: passwordController.text.trim(),
                         );
-                        authStore.signUp().then((value) => Navigator.of(context)
-                            .pushReplacementNamed(MyRoutes.checkRoleScreen));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('The Sign Up process has failed!')),
-                        );
+                        try {
+                          await AuthHelper.authHelper
+                              .logIn(
+                                email: userModel.email,
+                                password: userModel.password,
+                              )
+                              .then((value) => Navigator.of(context)
+                                  .pushReplacementNamed(
+                                      MyRoutes.checkRoleScreen));
+                        } catch (e) {
+                          print('Login failed: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Login failed: $e'),
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Padding(
@@ -460,7 +328,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  "SIGN UP",
+                                  "LOGIN",
                                   style: GoogleFonts.solway(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,

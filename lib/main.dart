@@ -1,15 +1,16 @@
 import 'package:attendence_management_system/provider/get_store.dart';
 import 'package:attendence_management_system/view/screen/auth_checker_screen.dart';
 import 'package:attendence_management_system/view/screen/check_role_screen.dart';
+import 'package:attendence_management_system/view/screen/edit_profile_screen.dart';
+import 'package:attendence_management_system/view/screen/login_screen.dart';
+import 'package:attendence_management_system/view/screen/sign_up_screen.dart';
+import 'package:attendence_management_system/view/screen/splash_screen.dart';
 import 'package:attendence_management_system/view/screen/student/analytics_screen.dart';
 import 'package:attendence_management_system/view/screen/student/attendance_screen.dart';
 import 'package:attendence_management_system/view/screen/student/home/home_bottom_navigation_screen.dart';
 import 'package:attendence_management_system/view/screen/student/home/home_screen.dart';
-import 'package:attendence_management_system/view/screen/student/login_screen.dart';
-import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
-import 'package:attendence_management_system/view/screen/student/splash_screen.dart';
-import 'package:attendence_management_system/view/screen/student/user_profile_screen.dart';
 import 'package:attendence_management_system/view/screen/teacher/home/home_paget.dart';
+import 'package:attendence_management_system/view/screen/user_profile_screen.dart';
 import 'package:attendence_management_system/view/utils/my_routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
           MyRoutes.attendanceScreen: (context) => const MyAttendance(),
           MyRoutes.analyticsScreen: (context) => const MyAnalyticsScreen(),
           MyRoutes.profile: (context) => const ProfileScreen(),
+          MyRoutes.editProfile: (context) => const EditProfileScreen(),
         },
       );
     });

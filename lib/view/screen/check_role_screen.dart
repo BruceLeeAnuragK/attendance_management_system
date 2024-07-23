@@ -1,6 +1,6 @@
 import 'package:attendence_management_system/provider/store_file/auth_store.dart';
+import 'package:attendence_management_system/view/screen/sign_up_screen.dart';
 import 'package:attendence_management_system/view/screen/student/home/home_bottom_navigation_screen.dart';
-import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
 import 'package:attendence_management_system/view/screen/teacher/home/home_paget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

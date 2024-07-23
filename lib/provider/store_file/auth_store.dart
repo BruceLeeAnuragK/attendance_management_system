@@ -56,9 +56,15 @@ class AuthStore with Store {
     final String password = passwordController.text.trim();
     final String username = usernameController.text.trim();
     final String role = selectedRole.value!;
+    final String id = "";
 
     UserModel userModel = UserModel(
-        email: email, password: password, username: username, role: role);
+      id: id,
+      email: email,
+      password: password,
+      username: username,
+      role: role,
+    );
 
     try {
       await FireStoreHelper.storeHelper
@@ -68,6 +74,7 @@ class AuthStore with Store {
     }
   }
 
+  ///
   void logInUser(UserModel userModel) async {
     await FireStoreHelper.storeHelper.logIn(userModel: userModel);
   }
@@ -355,15 +362,57 @@ class AuthStore with Store {
   }
 
   Future<void> fetchAllUsers() async {
-    List<UserModel> users = await FireStoreHelper.storeHelper.fetchAllUsers();
-    adminUsers.clear();
-    normalUsers.clear();
-    for (var user in users) {
-      if (user.role == 'Admin') {
-        adminUsers.add(user);
-      } else {
-        normalUsers.add(user);
+    List<UserModel> users = [];
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+      for (var doc in snapshot.docs) {
+        users
+            .add(UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id));
       }
+      runInAction(() {
+        adminUsers.clear();
+        normalUsers.clear();
+        for (var user in users) {
+          if (user.role == 'Admin') {
+            adminUsers.add(user);
+          } else {
+            normalUsers.add(user);
+          }
+        }
+      });
+    } catch (e) {
+      logger.e('Failed to fetch users: $e');
     }
+  }
+
+  Future<void> fetchWeeklyAttendanceRecords(
+      {required String userId, required DateTime selectedWeek}) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await FireStoreHelper
+          .storeHelper
+          .getAttendanceRecordsForWeek(userId, selectedWeek);
+      List<Map<String, dynamic>> records =
+          querySnapshot.docs.map((doc) => doc.data()).toList();
+      runInAction(() {
+        // Store the weekly records for further processing
+        dailyAttendanceRecords.value = records;
+      });
+    } catch (e) {
+      logger.e('Failed to fetch weekly attendance records: $e');
+    }
+  }
+
+  Map<String, double> calculatePercentages(List<Map<String, dynamic>> records) {
+    int total = records.length;
+    int presentCount = records.where((r) => r['type'] == 'Present').length;
+    int absentCount = records.where((r) => r['type'] == 'Absent').length;
+    int halfDayCount = records.where((r) => r['type'] == 'HalfDay').length;
+
+    return {
+      'Present': (presentCount / total) * 100,
+      'Absent': (absentCount / total) * 100,
+      'HalfDay': (halfDayCount / total) * 100,
+    };
   }
 }

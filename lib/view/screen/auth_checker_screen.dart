@@ -1,6 +1,6 @@
 import 'package:attendence_management_system/view/screen/check_role_screen.dart';
-import 'package:attendence_management_system/view/screen/student/login_screen.dart';
-import 'package:attendence_management_system/view/screen/student/sign_up_screen.dart';
+import 'package:attendence_management_system/view/screen/login_screen.dart';
+import 'package:attendence_management_system/view/screen/sign_up_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,9 @@ class _AuthCheckerScreenState extends State<AuthCheckerScreen> {
                   ),
                 );
               } else if (userSnapshot.hasError) {
-                return const Text('Error loading user data');
+                return Scaffold(
+                    body:
+                        Center(child: const Text('Error loading user data ')));
               } else if (userSnapshot.hasData && userSnapshot.data!.exists) {
                 return const CheckRoleScreen();
               } else {

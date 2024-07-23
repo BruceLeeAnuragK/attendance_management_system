@@ -8,6 +8,7 @@ import '../../../../provider/store_file/auth_store.dart';
 import '../../../../provider/store_file/profile_store.dart';
 import '../../../components/glass_box.dart';
 import '../../../utils/my_routes.dart';
+import '../users_detail_screen.dart';
 
 class THomePage extends StatefulWidget {
   const THomePage({super.key});
@@ -18,9 +19,7 @@ class THomePage extends StatefulWidget {
 
 class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
   final AuthStore authStore = getIt<AuthStore>();
-
   final ProfileStore profileStore = getIt<ProfileStore>();
-
   late TabController tabController;
 
   @override
@@ -76,7 +75,9 @@ class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
               child: Row(
                 children: [
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(MyRoutes.editProfile);
+                    },
                     child: Container(
                       alignment: Alignment.center,
                       height: 5.h,
@@ -124,7 +125,7 @@ class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
                         authStore.email.value,
                         style: GoogleFonts.solway(
                           color: Colors.blue,
-                          fontSize: 15.sp,
+                          fontSize: 10.sp,
                         ),
                       );
                     },
@@ -254,7 +255,7 @@ class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
               "Admins",
               style: GoogleFonts.solway(
                 color: Colors.black,
-                fontSize: 20.sp,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -262,7 +263,7 @@ class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
               "Users",
               style: GoogleFonts.solway(
                 color: Colors.black,
-                fontSize: 20.sp,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -315,23 +316,48 @@ class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
                   final admin = authStore.adminUsers[index];
                   return Padding(
                     padding: const EdgeInsets.all(10),
-                    child: Container(
-                      height: 15.h,
-                      width: 30.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.bottomLeft,
-                          colors: [
-                            Colors.grey.withOpacity(0.5),
-                            Colors.white.withOpacity(0.99),
-                          ],
+                    child: GestureDetector(
+                      onTap: () async {
+                        await authStore.fetchDailyAttendanceRecords(
+                            userId: admin.id, selectedMonth: DateTime.now());
+
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => UserAttendancePage(
+                            userModel: admin,
+                          ),
+                        ));
+                      },
+                      child: Container(
+                        height: 15.h,
+                        width: 30.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.bottomLeft,
+                            colors: [
+                              Colors.grey.withOpacity(0.5),
+                              Colors.white.withOpacity(0.99),
+                            ],
+                          ),
                         ),
-                      ),
-                      child: ListTile(
-                        title: Text(admin.username),
-                        subtitle: Text(admin.email),
+                        child: ListTile(
+                          title: Text(
+                            admin.username,
+                            style: GoogleFonts.solway(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Text(
+                            admin.email,
+                            style: GoogleFonts.solway(
+                              fontSize: 10.sp,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -347,23 +373,47 @@ class _THomePageState extends State<THomePage> with TickerProviderStateMixin {
                   final user = authStore.normalUsers[index];
                   return Padding(
                     padding: const EdgeInsets.all(10),
-                    child: Container(
-                      height: 15.h,
-                      width: 30.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.bottomLeft,
-                          colors: [
-                            Colors.grey.withOpacity(0.5),
-                            Colors.white.withOpacity(0.99),
-                          ],
+                    child: GestureDetector(
+                      onTap: () async {
+                        await authStore.fetchDailyAttendanceRecords(
+                            userId: user.id, selectedMonth: DateTime.now());
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => UserAttendancePage(
+                            userModel: user,
+                          ),
+                        ));
+                      },
+                      child: Container(
+                        height: 15.h,
+                        width: 30.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.bottomLeft,
+                            colors: [
+                              Colors.grey.withOpacity(0.5),
+                              Colors.white.withOpacity(0.99),
+                            ],
+                          ),
                         ),
-                      ),
-                      child: ListTile(
-                        title: Text(user.username),
-                        subtitle: Text(user.email),
+                        child: ListTile(
+                          title: Text(
+                            user.username,
+                            style: GoogleFonts.solway(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Text(
+                            user.email,
+                            style: GoogleFonts.solway(
+                              fontSize: 10.sp,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   );

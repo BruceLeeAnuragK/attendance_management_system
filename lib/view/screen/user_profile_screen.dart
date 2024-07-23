@@ -6,9 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../provider/store_file/auth_store.dart';
-import '../../../provider/store_file/profile_store.dart';
-import '../../utils/my_routes.dart';
+import '../../provider/store_file/auth_store.dart';
+import '../../provider/store_file/profile_store.dart';
+import '../utils/my_routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -131,7 +131,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               children: [
                 MaterialButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(MyRoutes.editProfile);
+                  },
                   child: Container(
                     alignment: Alignment.center,
                     height: 5.h,
@@ -245,11 +247,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  authStore.logOut().then((value) {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context)
-                                        .pushNamed(MyRoutes.login);
-                                  });
+                                  authStore.logOut().then(
+                                    (value) {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context)
+                                          .pushNamed(MyRoutes.login);
+                                    },
+                                  );
                                 },
                                 child: Text(
                                   "Yes",
