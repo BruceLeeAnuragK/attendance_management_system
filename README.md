@@ -13,6 +13,7 @@ Features:
  6.Notifications and Reminder :- Notify users if they are absent or if there is an abnormal attendance patter. Remind users of upcoming important dates and deadlines related to attendance.
 
 Images:
+
 <img src="https://github.com/user-attachments/assets/34af2a26-2821-4930-b456-2258a4ab27f3" height="200">
 <img src="https://github.com/user-attachments/assets/8e4df5dc-0854-4eaf-ad54-3f828780720d" height="200">
 <img src="https://github.com/user-attachments/assets/20d555b6-4197-4329-8012-693b66bb3da0" height="200">
