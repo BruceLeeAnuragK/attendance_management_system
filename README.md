@@ -5,12 +5,19 @@ Description:
 An Attendance Management System is a tool designed to track and manage the attendance of students or employees in an organization. The system automates the process of recording attendance, making it efficient and reducing the possibility of errors associated with manual entry. This system can be developed as a Flutter app, providing a user-friendly interface for users to mark their attendance, view attendance records, and generate attendance reports. The app will use the Montserrat font family for a clean and modern look.
 
 Features:
+
  1.User Authentication :- New users can create an account using email and password. Existing users can log in using their credentials.
+ 
  2.Dashboard :-A summary of recent attendance records, upcoming events, and notifications. Display user information and allow profile updates.
+ 
  3.Attendance Marking :- Allow users to manually mark their attendance for the dayEnable attendance marking through QR code scanning for quick and contactless recording.
+ 
  4.Attendance History :- Provide users with access to their past attendance records in a calendar view. Allow users to export their attendance history in CSV or PDF format.
+ 
  5.Reporting and Analytics :- Enable users to generate attendance reports for a specified period. Display visual statistics such as attendance percentages and trends.
+ 
  6.Notifications and Reminder :- Notify users if they are absent or if there is an abnormal attendance patter. Remind users of upcoming important dates and deadlines related to attendance.
+ 
 
 Images:
 
