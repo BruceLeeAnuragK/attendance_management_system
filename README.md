@@ -16,7 +16,7 @@ Features:
  
  5.Reporting and Analytics :- Enable users to generate attendance reports for a specified period. Display visual statistics such as attendance percentages and trends.
  
- 6.Notifications and Reminder :- Notify users if they are absent or if there is an abnormal attendance patter. Remind users of upcoming important dates and deadlines related to attendance.(not done)
+ 6.Notifications and Reminder :- Notify users if they are absent or if there is an abnormal attendance patter. Remind users of upcoming important dates and deadlines related to attendance.(upcoming)
  
 
 Images:
